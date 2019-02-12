@@ -3,13 +3,19 @@ import os
 import re
 import requests
 import time
+import argparse
 
 
 def main():
-    subreddit = 'memes'  # Which subreddit to download from.
-    sleep_time = 60  # How long to wait between searches (in seconds)
-    limit = 100  # Limit how many new posts to get. Set to None to grab as many as possible.
-    loop = True  # Continuously grab images, waiting *sleep_time* between loops.
+
+    """TODO VALIDATE SUBREDDIT."""
+
+    args = argument_parser()
+
+    subreddit = args.subreddit  # Which subreddit to download from.
+    sleep_time = args.s  # How long to wait between searches (in seconds)
+    limit = args.l  # Limit how many new posts to get. Set to None to grab as many as possible.
+    loop = args.r  # Continuously grab images, waiting *sleep_time* between loops.
 
     # See Authentication class for info if you want to modify these values.
     auth_file = Authentication(client_id='zlGNo2QoKclQlQ',
@@ -98,7 +104,7 @@ class Image(object):
 
         return save_name
 
-    def check_if_exists(self):
+    def exists(self):
         """ Check if file exists in the subreddit directory by checking the end of the file names against the
         file name in the URL. Returns True if it exists."""
 
@@ -126,7 +132,8 @@ class Image(object):
 
 
 def grab_image_links(subreddit_name, auth_file, limit):
-    """ Checks for new images and downloads them to a folder named after the subreddit """
+    """ Checks for new images and downloads them to a folder named after the subreddit
+        TODO COUNT TIL WE HAVE LIMIT """
 
     reddit = login(auth_file)  # Log into reddit.
     subreddit = reddit.subreddit(subreddit_name)  # Choose a subreddit.
@@ -139,21 +146,23 @@ def grab_image_links(subreddit_name, auth_file, limit):
 
         pass
 
-    image_regex = re.compile(r"(http.+?)(\w+)(\.\w+)+(?!.*(\w+)(\.jpg|\.png)+)")
+    valid_image_regex = re.compile(r"(http.+?)(\w+)(\.\w+)+(?!.*(\w+)(\.jpg|\.png)+)")
 
-    for item in subreddit.hot(limit=limit):
+
+    for post in subreddit.hot(limit=limit):
 
         # Used to check if the URL matches one for an image, get the extension, and file name.
-        regex = image_regex.search(item.url)
+        our_image_regex = valid_image_regex.search(post.url)
 
         # Init an image object with all the attr. our downloader will need.
-        download_this_image = Image(title=item.title,
-                                    url=item.url,
+        download_this_image = Image(title=post.title,
+                                    url=post.url,
                                     subreddit=subreddit_name,
-                                    file_name=regex.group(2),
-                                    file_extension=regex.group(3))
-
-        if is_image(download_this_image.url) and not download_this_image.check_if_exists():
+                                    file_name=our_image_regex.group(2),
+                                    file_extension=our_image_regex.group(3))
+        
+        # Check that the URL a valid image and then check that it does not exist already.
+        if is_image(download_this_image.url) and not download_this_image.exists():
             download_this_image.save()
 
 
@@ -184,6 +193,37 @@ def login(auth_file):
                          user_agent=auth_file.useragent)
 
     return reddit
+
+
+def argument_parser():
+    """ Adds a few command line arguments to improve usability. """
+    parser = argparse.ArgumentParser(description="Downloads images from 'hot' section of the specified subreddit")
+
+    # Choose subreddit, non optional
+    parser.add_argument('subreddit',
+                        help='The subreddit you want to download images from.',
+                        type=str,
+                        default='aww')  # Default unneeded because this is non-optional?
+
+    # Limit how many images to download.
+    parser.add_argument('-l', '-limit',
+                        help='The number of images you want to grab. Default: 100',
+                        type=int,
+                        default=100)
+
+    # Whether or not to loop.
+    parser.add_argument('-r', '-repeat',
+                        help='Repeat downloading new images until you close the script.',
+                        action='store_true')
+
+    # Time between loops.
+    parser.add_argument('-s', '-sleep',
+                        help='If repeat is True this is how long the script waits (in seconds) '
+                             'before repeating. Default: 60',
+                        default=60,
+                        type=int)
+
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
