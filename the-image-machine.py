@@ -1,108 +1,166 @@
 import praw
-import logging
-import configparser
 import os
 import re
 import requests
 import time
 
-logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s - %(message)s')
-
 
 def main():
-
     subreddit = 'memes'  # Which subreddit to download from.
-    sleep_time = 30  # How long to wait between searches.
-    auth_file = 'reddit-auth.ini'  # Bot auth info
-    limit = 20  # Limit how many new posts to get.
+    sleep_time = 60  # How long to wait between searches (in seconds)
+    limit = 100  # Limit how many new posts to get. Set to None to grab as many as possible.
+    loop = True  # Continuously grab images, waiting *sleep_time* between loops.
 
-    loop = True
+    # See Authentication class for info if you want to modify these values.
+    auth_file = Authentication(client_id='zlGNo2QoKclQlQ',
+                               useragent='script by /u/AntiHydrogen v0.1')
 
     while True:
+
         if loop:
+
             grab_image_links(subreddit_name=subreddit,
                              auth_file=auth_file,
                              limit=limit)
-            print('Images grabbed. Sleeping for {} seconds.'.format(sleep_time))
+
+            print('Sleeping for {} seconds.\n'.format(sleep_time))
             time.sleep(sleep_time)
+
         else:
+
             print('Images grabbed. Exiting.')
             break
 
 
+class Authentication(object):
+    """ A class which holds the details needed to start a PRAW reddit object. My implementation works
+        with reddit in read-only mode which can grab images from public subreddits so we do not use a
+        client_secret, username, or password. I /assume/ you could add in a username, password, and
+        client_secret to use private subreddits accessible to your account, however, this is untested
+        and may not work (insert ominous music here).
+
+        The necessary details can be found on your 'https://www.reddit.com/prefs/apps/' if you want to
+        use your own client_id/secret.
+
+    Attributes:
+        client_id       Reddit application client-id
+        client_secret   Reddit application client_secret. We do not use a secret in this script because
+                        we only need read-only access to public subreddits so we init to None.
+        useragent       A useragent to identify ourselves to Reddit.
+        username        Reddit username
+        password        Reddit password
+
+    """
+    def __init__(self, client_id, useragent):
+        self.client_id = client_id
+        self.client_secret = None
+        self.useragent = useragent
+        self.username = None
+        self.password = None
+
+
+class Image(object):
+    """ A class which represents all the attributes of a reddit image post
+        that we need to download images.
+
+    Attributes:
+        title       The title of the post
+        url         The URL of the image
+        subreddit   The subreddit where the image is from
+        extension   The file extension. (ex. '.jpg')
+        name        The name of the file. Random characters, usually, but
+                    useful to make sure we're not downloading duplicates.
+        save_name   The name this image will be saved as if we call .save()
+
+    """
+
+    def __init__(self, title, url, subreddit, file_extension, file_name):
+        self.title = title
+        self.url = url
+        self.subreddit = subreddit
+        self.extension = file_extension
+        self.name = file_name
+        self.save_name = self.get_save_name()
+
+    def get_save_name(self):
+        """ Returns a name to save the file as. """
+
+        # Characters which are not alphanumeric that we still want to keep.
+        keep_these_char = (' ', '.', '_')
+
+        save_name = "".join(c for c in self.title if c.isalnum() or c in keep_these_char).rstrip() \
+                    + " - {}{}".format(self.name, self.extension)
+
+        # Attempt to protect ourselves from an absurdly long title.
+        if len(save_name) > 130:
+            # Cut the file name down to the first and last 60 char.
+            save_name = save_name[:60] + '...' + save_name[-60:]
+
+        return save_name
+
+    def check_if_exists(self):
+        """ Check if file exists in the subreddit directory by checking the end of the file names against the
+        file name in the URL. Returns True if it exists."""
+
+        if os.path.exists(self.subreddit):
+            for file in os.listdir(self.subreddit):
+                if file.endswith(self.name + self.extension):
+                    return True  # Found
+            return False  # No match found
+        else:
+            return False  # If there's no subreddit directory the file cannot exist.
+
+    def save(self):
+
+        print("Downloading: {}".format(self.save_name))
+
+        res = requests.get(self.url, headers={'User-agent': 'script by /u/AntiHydrogen 0.1'})
+        res.raise_for_status()
+
+        image_file = open(os.path.join(self.subreddit, os.path.basename(self.save_name)), 'wb')
+
+        for chunk in res.iter_content(100000):
+            image_file.write(chunk)
+
+        image_file.close()
+
+
 def grab_image_links(subreddit_name, auth_file, limit):
     """ Checks for new images and downloads them to a folder named after the subreddit """
-
-    image_subdir = 'subreddit-images'  # Where we will store our subreddit folders
 
     reddit = login(auth_file)  # Log into reddit.
     subreddit = reddit.subreddit(subreddit_name)  # Choose a subreddit.
 
     try:
 
-        # Try to make a subdir under image_subdir named after the subreddit
-        os.makedirs(os.path.join(image_subdir, subreddit_name))
+        os.mkdir(subreddit_name)
 
     except FileExistsError:
-        # Already exists
+
         pass
 
     image_regex = re.compile(r"(http.+?)(\w+)(\.\w+)+(?!.*(\w+)(\.jpg|\.png)+)")
 
-    for item in subreddit.new(limit=limit):
-        image_url = item.url
+    for item in subreddit.hot(limit=limit):
 
-        # Used to check if the URL matches one for an image and get a file extension
-        regex = image_regex.search(image_url)
+        # Used to check if the URL matches one for an image, get the extension, and file name.
+        regex = image_regex.search(item.url)
 
-        if is_image(image_url) and not check_if_exists(regex.group(2), regex.group(3), image_subdir, subreddit_name):
+        # Init an image object with all the attr. our downloader will need.
+        download_this_image = Image(title=item.title,
+                                    url=item.url,
+                                    subreddit=subreddit_name,
+                                    file_name=regex.group(2),
+                                    file_extension=regex.group(3))
 
-            # Download the image.
-            logging.debug("Downloading image: %s" % image_url)
-            res = requests.get(image_url, headers={'User-agent': 'script by AntiHydrogen 0.1'})
-            res.raise_for_status()
-
-            # Characters which are not alphanumeric that we still want to keep.
-            keep_these_char = (' ', '.', '_')
-
-            # Create the file name. Uses the meme post title, keeps all alphanumeric
-            # characters and those specified in 'keep_these_char'. Appends the file extension.
-            file_extension = regex.group(3)
-            file_name = regex.group(2)
-
-            save_name = "".join(c for c in item.title if c.isalnum() or c in keep_these_char).rstrip() \
-                        + " - {}{}".format(file_name, file_extension)
-
-            # Attempt to protect ourselves from an absurdly long title.
-            if len(save_name) > 160:
-                save_name = save_name[:60] + '...' + save_name[-60:]
-
-            logging.debug('Saving as: %s' % save_name)
-
-            image_file = open(os.path.join(image_subdir, subreddit_name, os.path.basename(save_name)), 'wb')
-
-            for chunk in res.iter_content(100000):
-                image_file.write(chunk)
-
-            image_file.close()
-
-
-def check_if_exists(file_name, file_extension, image_subdir, subreddit_name):
-    """ Check if file exists in the subreddit directory by checking the end of the file names against the
-    file name in the URL. Returns True if it exists."""
-
-    file_ends_with = file_name + file_extension
-
-    for file in os.listdir(os.path.join(image_subdir, subreddit_name)):
-        if file.endswith(file_ends_with):
-            return True  # Found
-
-    return False  # No match found
+        if is_image(download_this_image.url) and not download_this_image.check_if_exists():
+            download_this_image.save()
 
 
 def is_image(url):
-    """ Check url against as regex which determines if it is a valid image URL. Returns true
-    if regex search does not return None"""
+    """ Check URLs against as regex which determines if it is a valid
+    image URL. Valid URLs are from the domain 'i.redd.it' or 'i.imgur.com'
+    Returns true if regex search does not return None """
 
     valid_image = re.compile(r'''(https?://(?:i\.redd\.it|i\.imgur\.com).*\.(?:png|jpg))''')
 
@@ -119,23 +177,11 @@ def is_image(url):
 
 
 def login(auth_file):
-    """ Creates and returns a praw Reddit object. """
+    """ Reads our auth_file and gets an instance of a PRAW Reddit object. """
 
-    config = configparser.ConfigParser()
-
-    try:
-
-        config.read(auth_file)
-
-    except configparser.Error:
-
-        logging.debug("Error reading {}".format(auth_file))
-
-    reddit = praw.Reddit(client_id=config['REDDIT-APP']['client-id'],
-                         client_secret=config['REDDIT-APP']['client-secret'],
-                         password=config['USER']['password'],
-                         user_agent=config['REDDIT-APP']['useragent'],
-                         username=config['USER']['username'])
+    reddit = praw.Reddit(client_id=auth_file.client_id,
+                         client_secret=auth_file.client_secret,
+                         user_agent=auth_file.useragent)
 
     return reddit
 

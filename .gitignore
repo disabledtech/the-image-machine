@@ -203,7 +203,4 @@ dmypy.json
 
 # End of https://www.gitignore.io/api/python,pycharm
 
-/subreddit-images/**
-.idea/*.*
-reddit-auth.ini
-existing_files.txt
+.idea/
