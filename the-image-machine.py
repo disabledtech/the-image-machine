@@ -159,8 +159,8 @@ def grab_image_links(subreddit_name, auth_file, limit):
 
 def is_image(url):
     """ Check URLs against as regex which determines if it is a valid
-    image URL. Valid URLs are from the domain 'i.redd.it' or 'i.imgur.com'
-    Returns true if regex search does not return None """
+    image URL. Valid URLs are from the domain 'i.redd.it' or 'i.imgur.com' and
+    end in .jpg or .png."""
 
     valid_image = re.compile(r'''(https?://(?:i\.redd\.it|i\.imgur\.com).*\.(?:png|jpg))''')
 
@@ -173,11 +173,11 @@ def is_image(url):
     assert valid_image.search('https://www.youtube.com/watch?v=dQw4w9WgXcQ') is None, \
         'Error. Non-image links ARE validating in is_image()'
 
-    return valid_image.search(url) is not None
+    return valid_image.search(url) is not None  # True if the search is not empty.
 
 
 def login(auth_file):
-    """ Reads our auth_file and gets an instance of a PRAW Reddit object. """
+    """ Reads our auth_file and returns an instance of a PRAW Reddit object. """
 
     reddit = praw.Reddit(client_id=auth_file.client_id,
                          client_secret=auth_file.client_secret,
