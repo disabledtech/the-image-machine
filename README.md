@@ -82,7 +82,7 @@ the-image-machine.py aww top-month -limit 35
 
 <br/>
 
-<h4>Example: `/r/wallpapers`
+### Example: `/r/wallpapers`
 ```
 the-image-machine.py wallpapers new -limit 10 -repeat -wait 120 -nsfw
 ```
