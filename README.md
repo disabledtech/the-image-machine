@@ -3,9 +3,6 @@
 
 <h1 align="center">TIM  (The Image Machine)</h1>
 
-> A configurable Python 3 script for bulk downloading images from Reddit.
-> README IS VERY W.I.P.
-
 <div align="center">
     A configurable <code>Python 3</code> script for bulk downloading images from Reddit.
 </div>
@@ -66,7 +63,7 @@ the-image-machine.py [subreddit] [sort_method] [-optional_parameters]
 
 <br/>
 
-<h4>Example: `/r/pics`
+### Example: `/r/pics`
 ```
 the-image-machine.py pics hot -repeat -wait 30
 ```
