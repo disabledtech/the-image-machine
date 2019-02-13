@@ -52,9 +52,9 @@ the-image-machine.py [subreddit] [sort_method] [-optional_parameters]
 | ------------- | -------------| 
 | `subreddit` | The subreddit you want to download images from. *Required.*| 
 | `sort [method]`      | Method of sorting when getting subreddit posts. *Required.*   |  
-| |*Sort methods:* `hot` `new` `rising` `top-all` `top-year` `top-month` `top-week` `top-day` `top-hour`| 
+| |*Methods:* `hot` `new` `rising` `top-all` `top-year` `top-month` `top-week` `top-day` `top-hour`| 
 | `-limit [#]`    | Maximum number of posts to process. Default `50` *Optional.*|
-| `-repeat`   | Use this flag to continuously grab images, waiting `wait_time` between checks.| 
+| `-repeat`   | Use this flag to continuously grab images, waiting `wait_time` between checks. *Optional.*| 
 | `-wait [#]`     | The time in seconds to wait before repeating if `-repeat` is used. Default: `60` *Optional*. |
 | `-nsfw`     | Use this flag to include posts marked **NSFW**. *Optional.* |
 
