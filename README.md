@@ -44,6 +44,8 @@ pip install praw
 the-image-machine.py [subreddit] [sort_method] [-optional_parameters]
 ```
 
+<br/>
+
 #### Parameters
 
 
@@ -58,6 +60,7 @@ the-image-machine.py [subreddit] [sort_method] [-optional_parameters]
 | `-wait [#]`     | The time in seconds to wait before repeating if `-repeat` is used. Default: `60` *Optional*. |
 | `-nsfw`     | Use this flag to include posts marked **NSFW**. *Optional.* |
 
+<br/>
 
 ## Examples
 
@@ -101,6 +104,7 @@ the-image-machine.py nsfw top-all -limit 50 -nsfw
 - **Includes** posts marked **NSFW**. 
 - Does **not** repeat.
 
+<br/>
 
 ---
 ## Support
@@ -112,8 +116,9 @@ Reach out to me at one of the following places!
 
 ---
 
+<br/>
+
 ## License
 
 - **[MIT license](http://opensource.org/licenses/mit-license.php)**
 
----
