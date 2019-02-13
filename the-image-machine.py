@@ -199,7 +199,7 @@ def grab_image_links(reddit, subreddit_name, limit, nsfw, mode):
                                     file_name=our_image_regex.group(2),
                                     file_extension=our_image_regex.group(3),
                                     nsfw=post.over_18)
-        
+
         # Check that the URL a valid image and then check that it does not exist already.
         if (not nsfw and not download_this_image.nsfw) or nsfw:
             if is_image(download_this_image.url) and not download_this_image.exists():
