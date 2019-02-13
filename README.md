@@ -1,14 +1,31 @@
 
 <a href="http://g.recordit.co/C4QK9yBmsq.gif"><img src="http://g.recordit.co/C4QK9yBmsq.gif"></a>
 
-<!-- (https://avatars1.githubusercontent.com/u/4284691?v=3&s=200)](http://fvcproductions.com) -->
-
-# The Image Machine (TIM)
+<h1 align="center">TIM  (The Image Machine)</h1>
 
 > A configurable Python 3 script for bulk downloading images from Reddit.
 > README IS VERY W.I.P.
 
-[![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
+<div align="center">
+    A configurable <code>Python 3</code> script for bulk downloading images from Reddit.
+</div>
+
+<br/>
+
+<div align="center">
+  <a href="http://badges.mit-license.org">
+    <img src="http://img.shields.io/:license-mit-blue.svg?style=flat-square)"
+      alt="MIT Licence" />
+  </a>
+</div>
+
+## Table of Contents
+- [Prerequisites](#prerequisites)
+- [Usage](#usage)
+- [Examples](#examples)
+- [Support](#support)
+
+
 
 ---
 
@@ -25,28 +42,31 @@ pip install praw
 ## Usage
 
 <br/>
- 
+
 ```
 the-image-machine.py [subreddit] [sort_method] [-optional_parameters]
 ```
 
 #### Parameters
+
+
+
 | Parameter     | Description |
 | ------------- | -------------| 
 | `subreddit` | The subreddit you want to download images from. *Required.*| 
-| `sort`      | Method of sorting when getting subreddit posts. *Required.*   |  
+| `sort [method]`      | Method of sorting when getting subreddit posts. *Required.*   |  
 | |*Sort methods:* `hot` `new` `rising` `top-all` `top-year` `top-month` `top-week` `top-day` `top-hour`| 
-| `-limit`    | Maximum number of posts to process. Default `50` *Optional.*|
+| `-limit [#]`    | Maximum number of posts to process. Default `50` *Optional.*|
 | `-repeat`   | Use this flag to continuously grab images, waiting `wait_time` between checks.| 
-| `-wait`     | The time in seconds to wait before repeating if `-repeat` is used. Default: `60` *Optional*. |
+| `-wait [#]`     | The time in seconds to wait before repeating if `-repeat` is used. Default: `60` *Optional*. |
 | `-nsfw`     | Use this flag to include posts marked **NSFW**. *Optional.* |
-|
+
 
 ## Examples
 
 <br/>
 
-####Example: `/r/pics`
+<h4>Example: `/r/pics`
 ```
 the-image-machine.py pics hot -repeat -wait 30
 ```
@@ -57,7 +77,7 @@ the-image-machine.py pics hot -repeat -wait 30
 
 <br/>
 
-####Example: `/r/aww`
+<h4>Example: `/r/aww`
 ```
 the-image-machine.py aww top-month -limit 35
 ```
@@ -67,7 +87,7 @@ the-image-machine.py aww top-month -limit 35
 
 <br/>
 
-####Example: `/r/wallpapers`
+<h4>Example: `/r/wallpapers`
 ```
 the-image-machine.py wallpapers new -limit 10 -repeat -wait 120 -nsfw
 ```
@@ -78,7 +98,7 @@ the-image-machine.py wallpapers new -limit 10 -repeat -wait 120 -nsfw
 
 <br/>
 
-####Example: `/r/nsfw`
+<h4>Example: `/r/nsfw`
 ```
 the-image-machine.py nsfw top-all -limit 50 -nsfw
 ```
