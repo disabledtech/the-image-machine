@@ -44,11 +44,7 @@ pip install praw
 the-image-machine.py [subreddit] [sort_method] [-optional_parameters]
 ```
 
-<br/>
-
-#### Parameters
-
-
+### Parameters
 
 | Parameter     | Description |
 | ------------- | -------------| 
@@ -61,6 +57,8 @@ the-image-machine.py [subreddit] [sort_method] [-optional_parameters]
 | `-nsfw`     | Use this flag to include posts marked **NSFW**. *Optional.* |
 
 <br/>
+
+---
 
 ## Examples
 
@@ -107,6 +105,7 @@ the-image-machine.py nsfw top-all -limit 50 -nsfw
 <br/>
 
 ---
+
 ## Support
 
 Reach out to me at one of the following places!
@@ -114,9 +113,9 @@ Reach out to me at one of the following places!
 - Reddit at <a href="https://www.reddit.com/user/AntiHydrogen" target="_blank">`/u/AntiHydrogen`</a>
 - Github at <a href="https://github.com/disabledtech" target="_blank">`disabledtech`</a>
 
----
-
 <br/>
+
+---
 
 ## License
 
