@@ -14,8 +14,8 @@ def main():
 
     subreddit = args.subreddit  # Which subreddit to download from.
     wait_time = args.wait  # How long to wait between searches (in seconds)
-    limit = args.limit  # Limit how many new posts to get. Set to None to grab as many as possible.
-    loop = args.repeat  # Continuously grab images, waiting *wait_time* between loops.
+    limit = args.limit  # Limit how many new posts to process.
+    repeat = args.repeat  # Continuously grab images, waiting *wait_time* between loops.
     nsfw = args.nsfw  # Include NSFW results. Default False.
     sort = args.sort  # Method of sorting when getting subreddit posts.
 
@@ -37,6 +37,7 @@ def main():
 
     print("Getting a maximum of {} images from reddit.com/r/{}. Sorting by: {}".format(limit, subreddit, sort))
     print("Saving images to *script-directory*/subreddit-images/{}\n".format(subreddit))
+
     while True:
 
         grab_image_links(reddit=reddit,
@@ -44,7 +45,7 @@ def main():
                          limit=limit,
                          nsfw=nsfw,
                          mode=sort)
-        if loop:
+        if repeat:
 
             print('Waiting for {} seconds.\n'.format(wait_time))
             time.sleep(wait_time)
