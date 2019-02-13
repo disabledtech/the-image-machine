@@ -61,8 +61,6 @@ the-image-machine.py [subreddit] [sort_method] [-optional_parameters]
 
 ## Examples
 
-<br/>
-
 ### Example: `/r/pics`
 ```
 the-image-machine.py pics hot -repeat -wait 30
@@ -74,7 +72,7 @@ the-image-machine.py pics hot -repeat -wait 30
 
 <br/>
 
-<h4>Example: `/r/aww`
+### Example: `/r/aww`
 ```
 the-image-machine.py aww top-month -limit 35
 ```
@@ -95,7 +93,7 @@ the-image-machine.py wallpapers new -limit 10 -repeat -wait 120 -nsfw
 
 <br/>
 
-<h4>Example: `/r/nsfw`
+### Example: `/r/nsfw`
 ```
 the-image-machine.py nsfw top-all -limit 50 -nsfw
 ```
